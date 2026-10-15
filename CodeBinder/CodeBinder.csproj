@@ -6,7 +6,7 @@
     <RollForward>LatestMajor</RollForward>
     <Nullable>enable</Nullable>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <Version>1.5.2</Version>
+    <Version>1.5.3</Version>
     <PackageIcon>icon.png</PackageIcon>
     <Description>CodeBinder code transpiler</Description>
     <PackAsTool>true</PackAsTool>

@@ -227,6 +227,11 @@ public sealed class NativeDependencyAttribute : CodeBinderAttribute
     }
 
     public string Name { get; private set; }
+
+    /// <summary>
+    /// The dependency is not required to be present
+    /// </summary>
+    public bool Optional { get; set; }
 }
 
 /// <summary>

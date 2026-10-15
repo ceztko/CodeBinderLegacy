@@ -68,14 +68,19 @@ function getLibraryPath(libFileName: string): string
 """
 }
 
-function loadLibrary(exports: object, libName: string): void
+function loadLibrary(exports: object, libName: string, optional: boolean = false): void
 {
     let libpath = getLibraryPath(`${libName}.${shext}`);
     if (!fs.existsSync(libpath))
     {
         libpath = getLibraryPath(`${shprefix}${libName}.${shext}`);
         if (!fs.existsSync(libpath))
-           throw new Error(`Could not find library ${libName}`); 
+        {
+            if (optional)
+                return;
+
+            throw new Error(`Could not find library ${libName}`);
+        }
     }
 
     // https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/65252
@@ -87,9 +92,9 @@ const mod = { exports: {} };
 
         var dependencies = Context.Compilation.Assembly.GetAttributes<NativeDependencyAttribute>();
         foreach (var dependency in dependencies)
-            appendLoadLibrary(builder, dependency.GetConstructorArgument<string>(0));
+            appendLoadLibrary(builder, dependency.GetConstructorArgument<string>(0), dependency.GetNamedArgumentOrDefault<bool>("Optional"));
 
-        appendLoadLibrary(builder, Context.LibraryName);
+        appendLoadLibrary(builder, Context.LibraryName, false);
 
         builder.AppendLine($"""
 let napi = (mod.exports as any)({ConversionCSharpToTypeScript.CodeBinderNamespace});
@@ -97,8 +102,11 @@ export default napi;
 """);
     }
 
-    void appendLoadLibrary(CodeBuilder builder, string libraryName)
+    void appendLoadLibrary(CodeBuilder builder, string libraryName, bool optional)
     {
-        builder.AppendLine($"loadLibrary(mod, '{libraryName}');");
+        if (optional)
+            builder.AppendLine($"loadLibrary(mod, '{libraryName}', true);");
+        else
+            builder.AppendLine($"loadLibrary(mod, '{libraryName}');");
     }
 }
